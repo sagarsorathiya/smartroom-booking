@@ -1,0 +1,5 @@
+{
+  "name": "SmartRoom Booking",
+  "description": "Internal portal for self-service meeting room booking with integrated IT/VC support automation and real-time availability tracking.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,237 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SmartRoom Booking - Base Styles */
+
+/* Ensure smooth transitions globally */
+*, *::before, *::after {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-timing-function: ease-out;
+  transition-duration: 150ms;
+}
+
+/* Focus visible only for keyboard nav */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ─── Dark Mode ──────────────────────────────────────────────────────────────
+   Uses .dark on <html> (Tailwind class strategy).
+   Descendent selectors have higher specificity (0,2,0) than Tailwind's (0,1,0)
+   so no !important is needed. Covers every component automatically.
+───────────────────────────────────────────────────────────────────────────── */
+
+.dark { color-scheme: dark; }
+
+/* ── 1. Core surfaces ──────────────────────────────────────────────────────── */
+.dark .bg-white     { background-color: #1e293b; }   /* slate-800  — primary surface  */
+.dark .bg-slate-50  { background-color: #0f172a; }   /* slate-950  — page/base bg     */
+.dark .bg-slate-100 { background-color: #0f172a; }   /* same as page bg → toggle-pill
+                                                         shells look sunken; active
+                                                         child (bg-white=#1e293b) pops  */
+.dark .bg-slate-200 { background-color: #334155; }   /* slate-700                      */
+
+/* ── 2. Opacity-variant classes ─────────────────────────────────────────────
+   CSS escapes the / so  bg-white/95  →  selector .bg-white\/95               */
+.dark .bg-white\/95     { background-color: rgba(15,  23,  42,  0.97); }
+.dark .bg-slate-50\/50  { background-color: rgba(15,  23,  42,  0.50); }
+.dark .bg-slate-50\/80  { background-color: rgba(15,  23,  42,  0.80); }
+
+/* ── 3. Accent / status backgrounds ─────────────────────────────────────────*/
+.dark .bg-indigo-50      { background-color: rgba(99,  102, 241, 0.12); }
+.dark .bg-indigo-50\/50  { background-color: rgba(99,  102, 241, 0.06); }
+.dark .bg-indigo-50\/80  { background-color: rgba(99,  102, 241, 0.15); }
+.dark .bg-indigo-50\/30  { background-color: rgba(99,  102, 241, 0.05); }
+.dark .bg-indigo-100     { background-color: rgba(99,  102, 241, 0.22); }
+
+.dark .bg-green-50       { background-color: rgba(34,  197, 94,  0.10); }
+.dark .bg-green-100      { background-color: rgba(34,  197, 94,  0.20); }
+.dark .bg-emerald-50     { background-color: rgba(16,  185, 129, 0.10); }
+.dark .bg-teal-50        { background-color: rgba(20,  184, 166, 0.10); }
+
+.dark .bg-amber-50       { background-color: rgba(245, 158, 11,  0.10); }
+.dark .bg-amber-100      { background-color: rgba(245, 158, 11,  0.20); }
+
+.dark .bg-red-50         { background-color: rgba(239, 68,  68,  0.10); }
+.dark .bg-red-50\/40     { background-color: rgba(239, 68,  68,  0.08); }
+.dark .bg-red-100        { background-color: rgba(239, 68,  68,  0.18); }
+.dark .bg-red-100\/60    { background-color: rgba(239, 68,  68,  0.12); }
+
+.dark .bg-blue-50        { background-color: rgba(59,  130, 246, 0.10); }
+.dark .bg-blue-100       { background-color: rgba(59,  130, 246, 0.20); }
+.dark .bg-purple-50      { background-color: rgba(168, 85,  247, 0.10); }
+
+/* ── 4. Gradient from/to overrides ─────────────────────────────────────────
+   Tailwind stores gradient colours as CSS vars (--tw-gradient-from / to).
+   Overriding them here re-colours every gradient that uses these tokens.      */
+.dark .from-green-50      { --tw-gradient-from: rgba(34,  197, 94,  0.10) var(--tw-gradient-from-position); }
+.dark .to-emerald-50      { --tw-gradient-to:   rgba(16,  185, 129, 0.08); }
+.dark .from-indigo-50     { --tw-gradient-from: rgba(99,  102, 241, 0.10) var(--tw-gradient-from-position); }
+.dark .to-blue-50         { --tw-gradient-to:   rgba(59,  130, 246, 0.08); }
+.dark .from-slate-50      { --tw-gradient-from: #0f172a var(--tw-gradient-from-position); }
+.dark .from-slate-50\/80  { --tw-gradient-from: rgba(15,  23,  42,  0.80) var(--tw-gradient-from-position); }
+.dark .to-white           { --tw-gradient-to:   #1e293b; }
+.dark .to-slate-100\/80   { --tw-gradient-to:   rgba(15,  23,  42,  0.80); }
+
+/* ── 5. Text colours ─────────────────────────────────────────────────────── */
+.dark .text-slate-900 { color: #f1f5f9; }
+.dark .text-slate-800 { color: #e2e8f0; }
+.dark .text-slate-700 { color: #cbd5e1; }
+.dark .text-slate-600 { color: #94a3b8; }
+.dark .text-slate-500 { color: #94a3b8; }
+.dark .text-slate-400 { color: #94a3b8; }  /* bumped: icons/secondary text more visible */
+.dark .text-slate-300 { color: #475569; }
+
+/* Calendar booking card text — light colours on near-transparent bg */
+.dark .text-amber-900  { color: #fcd34d; }   /* amber-300  */
+.dark .text-indigo-900 { color: #a5b4fc; }   /* indigo-300 */
+
+/* Coloured text on tinted bg chips / badges — must flip to light tones */
+.dark .text-indigo-600 { color: #818cf8; }   /* indigo-400 */
+.dark .text-indigo-700 { color: #a5b4fc; }   /* indigo-300 */
+.dark .text-purple-600 { color: #c084fc; }   /* purple-400 */
+.dark .text-purple-700 { color: #d8b4fe; }   /* purple-300 */
+.dark .text-amber-600  { color: #fbbf24; }   /* amber-400  */
+.dark .text-amber-700  { color: #fcd34d; }   /* amber-300  */
+.dark .text-amber-800  { color: #fde68a; }   /* amber-200  */
+.dark .text-green-600  { color: #4ade80; }   /* green-400  */
+.dark .text-green-700  { color: #86efac; }   /* green-300  */
+.dark .text-green-800  { color: #bbf7d0; }   /* green-200  */
+.dark .text-teal-600   { color: #2dd4bf; }   /* teal-400   */
+.dark .text-teal-700   { color: #5eead4; }   /* teal-300   */
+.dark .text-blue-600   { color: #60a5fa; }   /* blue-400   */
+.dark .text-blue-700   { color: #93c5fd; }   /* blue-300   */
+.dark .text-blue-800   { color: #bfdbfe; }   /* blue-200   */
+.dark .text-red-600    { color: #f87171; }   /* red-400    */
+.dark .text-red-700    { color: #fca5a5; }   /* red-300    */
+
+/* ── 6. Borders ─────────────────────────────────────────────────────────── */
+.dark .border-slate-100  { border-color: #334155; }
+.dark .border-slate-200  { border-color: #334155; }
+.dark .border-slate-300  { border-color: #475569; }
+.dark .border-indigo-100 { border-color: rgba(99,  102, 241, 0.25); }
+.dark .border-indigo-200 { border-color: rgba(99,  102, 241, 0.30); }
+.dark .border-green-100  { border-color: rgba(34,  197, 94,  0.25); }
+.dark .border-green-200  { border-color: rgba(34,  197, 94,  0.30); }
+.dark .border-blue-100   { border-color: rgba(59,  130, 246, 0.25); }
+.dark .border-purple-100 { border-color: rgba(168, 85,  247, 0.25); }
+.dark .border-purple-200 { border-color: rgba(168, 85,  247, 0.30); }
+.dark .border-amber-100  { border-color: rgba(245, 158, 11,  0.25); }
+.dark .border-red-200    { border-color: rgba(239, 68,  68,  0.30); }
+.dark .border-red-200\/60 { border-color: rgba(239, 68,  68,  0.15); }
+.dark .border-amber-400  { border-color: rgba(245, 158, 11,  0.60); }
+.dark .border-indigo-500 { border-color: rgba(99,  102, 241, 0.70); }
+
+/* ── 7. Ring colours (focus/hover outlines) ─────────────────────────────── */
+.dark .ring-indigo-200 { --tw-ring-color: rgba(99, 102, 241, 0.35); }
+
+/* ── 8. Divide lines ─────────────────────────────────────────────────────── */
+.dark .divide-slate-100 > * + * { border-color: #1e293b; }
+.dark .divide-slate-200 > * + * { border-color: #334155; }
+
+/* ── 9. Hover states ─────────────────────────────────────────────────────── */
+.dark .hover\:bg-slate-50:hover   { background-color: #334155; }
+.dark .hover\:bg-slate-100:hover  { background-color: #334155; }
+.dark .hover\:bg-white:hover      { background-color: #334155; }
+.dark .hover\:bg-indigo-50:hover  { background-color: rgba(99,  102, 241, 0.15); }
+.dark .hover\:bg-red-50:hover     { background-color: rgba(239, 68,  68,  0.12); }
+
+/* ── 10. Form inputs ─────────────────────────────────────────────────────── */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+  color-scheme: dark;        /* styles native browser chrome (date pickers etc.) */
+}
+.dark input::placeholder,
+.dark textarea::placeholder { color: #64748b; }
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #6366f1;
+  background-color: #1e293b;
+}
+
+/* ── 11. Shadows ─────────────────────────────────────────────────────────── */
+.dark .shadow-sm   { box-shadow: 0 1px 3px  rgba(0,0,0,0.50); }
+.dark .shadow-md   { box-shadow: 0 4px 8px  rgba(0,0,0,0.50); }
+.dark .shadow-lg   { box-shadow: 0 8px 24px rgba(0,0,0,0.60); }
+.dark .shadow-xl   { box-shadow: 0 20px 40px rgba(0,0,0,0.70); }
+.dark .shadow-2xl  { box-shadow: 0 24px 48px rgba(0,0,0,0.80); }
+
+/* ── 12. Skeleton loader ─────────────────────────────────────────────────── */
+.dark .animate-pulse .bg-slate-100,
+.dark .bg-slate-100.animate-pulse { background-color: #334155; }
+
+/* ── 13. Scrollbar (Webkit) ─────────────────────────────────────────────── */
+.dark ::-webkit-scrollbar              { width: 6px; height: 6px; }
+.dark ::-webkit-scrollbar-track        { background: #0f172a; }
+.dark ::-webkit-scrollbar-thumb        { background: #334155; border-radius: 3px; }
+.dark ::-webkit-scrollbar-thumb:hover  { background: #475569; }
+
+/* ── 14. Print / PDF export ─────────────────────────────────────────────── */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm;
+  }
+
+  html, body {
+    overflow: visible !important;
+    height: auto !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+
+  .report-print-root {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Never split a table row across a page */
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Repeat table header on every page if a table spans pages */
+  thead {
+    display: table-header-group;
+  }
+
+  /* Never split a print card */
+  .print-card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Never split a 2-col grid pair */
+  .print-grid-2 {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}

@@ -1,0 +1,319 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum UserRole {
+  EMPLOYEE
+  RECEPTION
+  IT
+  ADMINISTRATION
+  ADMIN
+}
+
+enum RoomType {
+  CONFERENCE
+  BOARD
+}
+
+enum BookingStatus {
+  CONFIRMED
+  PENDING
+  CANCELLED
+  COMPLETED
+}
+
+enum ITStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ServiceCategory {
+  FOOD_BEVERAGE
+  STATIONERY
+  EQUIPMENT
+  OTHER
+}
+
+enum ServiceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum AuditAction {
+  BOOKING_CREATED
+  BOOKING_CANCELLED
+  BOOKING_EDITED
+  BOOKING_APPROVED
+  ROOM_CREATED
+  ROOM_UPDATED
+  ROOM_DELETED
+  IT_STATUS_CHANGED
+  ROOM_BLOCKED
+  ROOM_UNBLOCKED
+  SETTINGS_UPDATED
+  USER_LOGIN
+  USER_CREATED
+  USER_UPDATED
+  USER_DELETED
+  PASSWORD_CHANGED
+  PROFILE_UPDATED
+  COMPANY_CREATED
+  COMPANY_UPDATED
+  COMPANY_DELETED
+  DEPARTMENT_CREATED
+  DEPARTMENT_UPDATED
+  DEPARTMENT_DELETED
+  DESIGNATION_CREATED
+  DESIGNATION_UPDATED
+  DESIGNATION_DELETED
+  SERVICE_UPDATED
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  domainId     String   @unique
+  email        String
+  passwordHash String?
+  role         UserRole @default(EMPLOYEE)
+  manualRole   Boolean  @default(false)
+  companyId      String?
+  departmentId   String?
+  designationId  String?
+  active       Boolean  @default(true)
+  lastLogin    DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  company     Company?     @relation(fields: [companyId], references: [id])
+  department  Department?  @relation(fields: [departmentId], references: [id])
+  designation Designation? @relation(fields: [designationId], references: [id])
+  bookings    Booking[]
+  auditLogs   AuditLog[]
+
+  @@map("users")
+}
+
+model Room {
+  id        String    @id @default(uuid())
+  name      String
+  type      RoomType
+  block     String
+  capacity  Int
+  facilities String[]
+  imageUrl  String?
+  notifyEmail    String   @default("")
+  restricted     Boolean  @default(false)
+  allowedUserIds String[] @default([])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  bookings     Booking[]
+  blockedSlots BlockedSlot[]
+
+  @@map("rooms")
+}
+
+model Booking {
+  id          String        @id @default(uuid())
+  roomId      String
+  userId      String
+  userName    String
+  title       String
+  startTime   DateTime
+  endTime     DateTime
+  status      BookingStatus @default(CONFIRMED)
+  participants Int
+  company     String
+  department  String
+  chairPerson String
+  agenda      String?
+  notifyEmails  String[]      @default([])
+  recurrenceId  String?
+  editedAt    DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // IT Requirements (embedded as fields)
+  vcRequired       Boolean @default(false)
+  createMeetingLink Boolean @default(false)
+  existingLink     String?
+  generatedLink    String?
+  meetingNumber    String?
+  meetingPassword  String?
+  platform         String?
+  avSetup          Boolean @default(false)
+  supportStandby   Boolean @default(false)
+  itNotes          String?
+  itStatus         ITStatus @default(PENDING)
+  itArchived       Boolean  @default(false)
+  vcAccountRef     String?  // pooled Webex account (e.g. "webex-1") that generated this link; null for Google Meet / manual
+  vcExternalEventId String? // Webex meeting id / Google Calendar event id backing the generated link — lets a reschedule update the same meeting in place instead of minting a new link
+
+  room Room @relation(fields: [roomId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  serviceRequests ServiceRequest[]
+  attachments     BookingAttachment[]
+
+  @@index([roomId, startTime, endTime])
+  @@index([userId])
+  @@index([status])
+  @@map("bookings")
+}
+
+model BlockedSlot {
+  id        String   @id @default(uuid())
+  roomId    String
+  startTime DateTime
+  endTime   DateTime
+  reason    String
+  blockedBy String
+  createdAt DateTime @default(now())
+
+  room Room @relation(fields: [roomId], references: [id])
+
+  @@index([roomId, startTime, endTime])
+  @@map("blocked_slots")
+}
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+
+  @@map("companies")
+}
+
+model Department {
+  id         String   @id @default(uuid())
+  companyIds String[]
+  name       String
+  code       String   @unique
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  users User[]
+
+  @@map("departments")
+}
+
+model Designation {
+  id         String   @id @default(uuid())
+  companyIds String[]
+  name       String
+  code       String   @unique
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  users User[]
+
+  @@map("designations")
+}
+
+model AuditLog {
+  id        String      @id @default(uuid())
+  userId    String
+  userName  String
+  action    AuditAction
+  details   String
+  ipAddress String?
+  timestamp DateTime    @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
+
+model ServiceRequest {
+  id            String          @id @default(uuid())
+  bookingId     String
+  category      ServiceCategory
+  items         String[]
+  quantity      Int             @default(1)
+  notes         String?
+  status        ServiceStatus   @default(PENDING)
+  handledBy     String?
+  handledByName String?
+  completedAt   DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("service_requests")
+}
+
+model BookingAttachment {
+  id           String   @id @default(uuid())
+  bookingId    String
+  filename     String   // UUID-based stored filename on disk
+  originalName String   // Original filename from the user
+  size         Int      // Bytes
+  mimeType     String
+  uploadedBy   String   // userId of uploader
+  createdAt    DateTime @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@map("booking_attachments")
+}
+
+model AppSettings {
+  id    String @id @default("singleton")
+  key   String @unique
+  value String // JSON string
+
+  @@map("app_settings")
+}
+
+model RoomBlockConfig {
+  id             String  @id @default(uuid())
+  name           String
+  code           String  @unique
+  active         Boolean @default(true)
+  itEmail        String  @default("")
+  receptionEmail String  @default("")
+  adminEmail     String  @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("room_block_configs")
+}
+
+model Facility {
+  id        String  @id @default(uuid())
+  name      String  @unique
+  active    Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("facilities")
+}

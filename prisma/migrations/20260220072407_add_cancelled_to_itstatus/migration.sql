@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "ITStatus" ADD VALUE 'CANCELLED';
