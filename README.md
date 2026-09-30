@@ -2,6 +2,31 @@
 
 An internal self-service portal that replaces email-based coordination for booking conference rooms and board rooms. Provides real-time availability, automated IT/VC request workflows, email notifications with calendar invites, and role-based administration.
 
+## Overview
+
+Booking a meeting room usually involves a chain of emails: checking who has the room, asking reception to confirm it, asking IT for a video-conference link, asking administration for tea and stationery. ConferenceHub puts that whole chain in one place.
+
+**How a booking flows through the portal**
+
+1. **Book** — an employee picks a room and time on the availability calendar. The server checks the request against existing bookings and admin-blocked slots in a single transaction, so two people can never book the same slot.
+2. **Rules apply** — portal settings can limit weekend bookings, maximum duration and how far ahead people can book, can require approval when a meeting exceeds a participant threshold, and can lock specific rooms to a list of allowed users.
+3. **Requests fan out** — video-conference, AV setup, standby support and food or stationery requests are turned into tasks for the IT and Administration queues automatically.
+4. **Notify** — the booker, invitees, reception and the relevant support teams get emails with calendar (ICS) invites that update or cancel in place when the booking changes.
+5. **Meeting link** — IT can approve a one-click Google Meet or Webex link, or paste one manually. If the meeting is later rescheduled, the same link can be moved to the new time.
+6. **Wrap up** — finished bookings close themselves, and every action is recorded in an audit log with the client IP.
+
+**Who it is for**
+
+- **Employees** book rooms, invite colleagues and attach files.
+- **Reception, IT and Administration** work from their own queues instead of a shared inbox.
+- **Admins** manage rooms, users, companies, departments, notification settings, LDAP/AD and meeting-link integrations, and see utilisation reports.
+
+**Design notes**
+
+- One Node.js process serves both the API and the built React app, which keeps deployment simple on a single Windows Server.
+- Sign in with a local password, LDAP/Active Directory, or Windows single sign-on behind IIS.
+- Integration credentials (SMTP, LDAP, Google Meet, Webex) are stored in the database and masked in the UI. They are never kept in `.env` or sent back to the browser.
+
 ---
 
 ## Tech Stack
