@@ -141,3 +141,9 @@ npm run deploy       # Build + deploy to the server in DEPLOY_PATH (run migratio
 ├── dist/            Built frontend (generated)
 └── dist-server/     Built API server (generated)
 ```
+
+---
+
+## License
+
+Released under the [MIT License](LICENSE).
